@@ -1,18 +1,36 @@
 package org.example.entity;
 
+import java.time.LocalDateTime;
+
 public class User {
-    private final String userId;
+    private Long id;
+    private String phone;
     private String email;
     private String password;
+    private String salt;
+    private LocalDateTime createdTime;
+    private LocalDateTime updatedTime;
 
-    public User(String userId, String email, String password) {
-        this.userId = userId;
-        this.email = email;
-        this.password = password;
+    public User(Long id) {
+        this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public User(Long id, String phone, String email, String password, String salt, LocalDateTime createdTime, LocalDateTime updatedTime) {
+        this.id = id;
+        this.phone = phone;
+        this.email = email;
+        this.password = password;
+        this.salt = salt;
+        this.createdTime = createdTime;
+        this.updatedTime = updatedTime;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getPhone() {
+        return phone;
     }
 
     public String getEmail() {
@@ -23,6 +41,26 @@ public class User {
         return password;
     }
 
+    public String getSalt() {
+        return salt;
+    }
+
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
+
+    public LocalDateTime getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -31,4 +69,15 @@ public class User {
         this.password = password;
     }
 
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    public void setCreatedTime(LocalDateTime createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public void setUpdatedTime(LocalDateTime updatedTime) {
+        this.updatedTime = updatedTime;
+    }
 }

@@ -29,8 +29,10 @@ public class Main {
         }
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
             DBInitializer databaseInitializer = sqlSession.getMapper(DBInitializer.class);
-            databaseInitializer.dropUsersTable();
-            databaseInitializer.createUsersTable();
+            databaseInitializer.dropUserTable();
+            databaseInitializer.dropUserInfoTable();
+            databaseInitializer.createUserTable();
+            databaseInitializer.createUserInfoTable();
             sqlSession.commit();
             //sqlSession.close(); //sqlSession will be closed automatically after leaving try block
         }catch(Exception e){

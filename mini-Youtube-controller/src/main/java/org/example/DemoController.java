@@ -11,8 +11,11 @@ public class DemoController {
     @Autowired
     private UserService userService;
 
+
     @DeleteMapping("/demos")
     public void delete(String userId) throws SQLException {
         userService.deleteUserById(userId);
     }
+
+
 }
