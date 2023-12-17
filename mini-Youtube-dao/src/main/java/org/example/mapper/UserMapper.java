@@ -9,21 +9,13 @@ public interface UserMapper {
             "VALUES (#{phone}, #{email}, #{password}, #{salt}, #{createdTime}, #{updatedTime})")
     void insertUser(User user);
 
-    @Select("SELECT * FROM users WHERE user_id = #{userId}")
-    @Results({
-            @Result(property = "userId", column = "user_id"),
-            @Result(property = "email", column = "email"),
-            @Result(property = "password", column = "password"),
-    })
-    User getUserById(String userId);
-
-    @Select("Select * from t_user where phone = #{phone}")
+    @Select("SELECT * from t_user where phone = #{phone}")
     User getUserByPhone(String phone);
 
-    @Update("UPDATE users SET email = #{email}, password = #{password} WHERE user_id = #{userId}")
-    void updateUser(User user);
+    @Select("SELECT * from t_user where email = #{email}")
+    User getUserByEmail(String email);
 
-    @Delete("DELETE FROM users WHERE user_id = #{userId}")
-    void deleteUserById(String userId);
+    @Select("SELECT * from t_user where phone = #{phone} or email = #{email}")
+    User getUserByPhoneOrEmail(String phone, String email);
 
 }

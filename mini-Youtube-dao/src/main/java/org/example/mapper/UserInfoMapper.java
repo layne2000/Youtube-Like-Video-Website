@@ -7,7 +7,7 @@ import org.example.entity.UserInfo;
 @Mapper
 public interface UserInfoMapper {
     @Insert("INSERT INTO t_user_info(userId, nickname, avatar, sign, gender, birthday, createdTime, " +
-            "updatedTime) VALUES(#(userId), #(nickname), #(avatar), #(sign), #(gender), #(createdTime)," +
-            " #(updatedTime))")
+            "updatedTime) VALUES (#{userId}, #{nickname}, #{avatar}, #{sign}, #{gender}, #{birthday}, " +
+            "#{createdTime}, #{updatedTime})")
     void insertUserInfo(UserInfo userInfo);
 }

@@ -2,7 +2,7 @@ package org.example.util;
 
 import java.io.Serializable;
 
-public class JsonResponse<T> implements Serializable {
+public class JsonResponse<T> {
     private String code;
     private String msg;
     private T data;
@@ -49,7 +49,7 @@ public class JsonResponse<T> implements Serializable {
         return msg;
     }
 
-    public T getDate(){
+    public T getData(){
         return data;
     }
 

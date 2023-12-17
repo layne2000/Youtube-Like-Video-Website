@@ -15,16 +15,6 @@ public class User {
         this.id = id;
     }
 
-    public User(Long id, String phone, String email, String password, String salt, LocalDateTime createdTime, LocalDateTime updatedTime) {
-        this.id = id;
-        this.phone = phone;
-        this.email = email;
-        this.password = password;
-        this.salt = salt;
-        this.createdTime = createdTime;
-        this.updatedTime = updatedTime;
-    }
-
     public Long getId() {
         return id;
     }

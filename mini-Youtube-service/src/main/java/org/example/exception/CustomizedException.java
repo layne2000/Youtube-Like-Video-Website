@@ -1,6 +1,5 @@
 package org.example.exception;
 
-import java.io.Serial;
 
 public class CustomizedException extends RuntimeException{
 
