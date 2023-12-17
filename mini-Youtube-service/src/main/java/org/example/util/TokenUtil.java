@@ -34,7 +34,7 @@ public class TokenUtil {
         }catch (TokenExpiredException e){
             throw new CustomizedException("Expired token", "555");
         }catch (Exception e){
-            throw new CustomizedException("Invalid token");
+            throw new CustomizedException("Illegal token");
         }
     }
 }

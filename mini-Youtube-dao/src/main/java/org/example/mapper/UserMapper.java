@@ -18,4 +18,18 @@ public interface UserMapper {
     @Select("SELECT * from t_user where phone = #{phone} or email = #{email}")
     User getUserByPhoneOrEmail(String phone, String email);
 
+    @Select("SELECT * from t_user where id = #{id}")
+    User getUserById(Long id);
+
+    @Update("<script>" +
+            "UPDATE t_user" +
+            "<set>" +
+            "  <if test=\"phone != null and phone != '' \"> phone = #{phone},</if>" +
+            "  <if test=\"email != null and email != '' \"> email = #{email},</if>" +
+            "  <if test=\"password != null and password != '' \"> password = #{password},</if>" +
+            "  updatedTime = #{updatedTime}" +
+            "</set>" +
+            "WHERE id = #{id}" +
+            "</script>")
+    void updateUser(User user);
 }

@@ -78,4 +78,20 @@ public class UserService {
         }
         return TokenUtil.generateToken(storedUser.getId());
     }
+
+    public User getUserById(Long userId){
+        User user = userMapper.getUserById(userId); // t_user doesn't store userInfo
+        user.setUserInfo(userInfoMapper.getUserInfoByUserId(userId));
+        return user;
+    }
+
+    public void updateUser(User user){
+        //TODO
+
+    }
+
+    public void updateUserInfo(UserInfo userInfo){
+        //TODO
+
+    }
 }

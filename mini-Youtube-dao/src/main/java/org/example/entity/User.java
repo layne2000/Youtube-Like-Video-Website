@@ -10,6 +10,7 @@ public class User {
     private String salt;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
+    private UserInfo userInfo;
 
     public User(Long id) {
         this.id = id;
@@ -43,6 +44,10 @@ public class User {
         return updatedTime;
     }
 
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -69,5 +74,9 @@ public class User {
 
     public void setUpdatedTime(LocalDateTime updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
     }
 }
