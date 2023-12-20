@@ -12,10 +12,6 @@ public class User {
     private LocalDateTime updatedTime;
     private UserInfo userInfo;
 
-    public User(Long id) {
-        this.id = id;
-    }
-
     public Long getId() {
         return id;
     }

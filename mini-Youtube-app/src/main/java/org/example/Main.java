@@ -31,8 +31,12 @@ public class Main {
             DBInitializer databaseInitializer = sqlSession.getMapper(DBInitializer.class);
             databaseInitializer.dropUserTable();
             databaseInitializer.dropUserInfoTable();
+            databaseInitializer.dropFollowingGroupTable();
+            databaseInitializer.dropUserFollowingTable();
             databaseInitializer.createUserTable();
             databaseInitializer.createUserInfoTable();
+            databaseInitializer.createFollowingGroupTable();
+            databaseInitializer.createUserFollowingTable();
             sqlSession.commit();
             //sqlSession.close(); //sqlSession will be closed automatically after leaving try block
         }catch(Exception e){

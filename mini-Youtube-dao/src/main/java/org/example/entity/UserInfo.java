@@ -12,6 +12,7 @@ public class UserInfo {
     private String birthday;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
+    private Boolean followed;
 
     public UserInfo(){
     }
@@ -52,6 +53,10 @@ public class UserInfo {
         return updatedTime;
     }
 
+    public Boolean getFollowed() {
+        return followed;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -86,5 +91,9 @@ public class UserInfo {
 
     public void setUpdatedTime(LocalDateTime updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public void setFollowed(Boolean followed) {
+        this.followed = followed;
     }
 }

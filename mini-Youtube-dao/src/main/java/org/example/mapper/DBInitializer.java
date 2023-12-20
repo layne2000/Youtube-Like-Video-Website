@@ -24,15 +24,43 @@ public interface DBInitializer {
     void dropUserInfoTable();
 
     @Update("CREATE TABLE t_user_info ("
-            + "id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
             + "userId bigint DEFAULT NULL, "
             + "nickname varchar(100) DEFAULT NULL, "
             + "avatar varchar(255) DEFAULT NULL, "
             + "sign text, "
-            + "gender varchar(2) DEFAULT NULL, "
+            + "gender varchar(10) DEFAULT NULL, "
             + "birthday varchar(20) DEFAULT NULL, "
             + "createdTime DATETIME DEFAULT NULL, "
             + "updatedTime DATETIME DEFAULT NULL"
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createUserInfoTable();
+
+    @Update("DROP TABLE IF EXISTS t_following_group;")
+    void dropFollowingGroupTable();
+
+    @Update("CREATE TABLE t_following_group ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "userId bigint DEFAULT NULL, "
+            + "name varchar(50) DEFAULT NULL COMMENT 'following group name', "
+            + "type varchar(5) DEFAULT NULL COMMENT 'following group type: 0 special attention "
+            + "1 follow privately 2 group by default 3 customized group', "
+            + "createdTime datetime DEFAULT NULL, "
+            + "updatedTime datetime DEFAULT NULL "
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createFollowingGroupTable();
+
+    @Update("DROP TABLE IF EXISTS t_user_following;")
+    void dropUserFollowingTable();
+
+    @Update("CREATE TABLE t_user_following ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "userId bigint DEFAULT NULL, "
+            + "followingId bigint DEFAULT NULL COMMENT 'user that is followed', "
+            + "groupId bigint DEFAULT NULL, "
+            + "createdTime datetime DEFAULT NULL "
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createUserFollowingTable();
+
+
 }

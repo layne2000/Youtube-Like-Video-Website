@@ -1,23 +1,27 @@
 package org.example;
 
+import com.alibaba.fastjson.JSONObject;
 import org.example.entity.User;
 import org.example.entity.UserInfo;
-import org.example.exception.CustomizedException;
 import org.example.util.JsonResponse;
+import org.example.util.PageResult;
 import org.example.util.RSAUtil;
 import org.example.util.UserSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class UserController {
     private final UserService userService;
-
+    private final UserFollowingService userFollowingService;
     private final UserSupport userSupport;
 
     @Autowired
-    public UserController(UserService userService, UserSupport userSupport){
+    public UserController(UserService userService, UserFollowingService userFollowingService, UserSupport userSupport){
         this.userService = userService;
+        this.userFollowingService = userFollowingService;
         this.userSupport = userSupport;
     }
 
@@ -55,6 +59,24 @@ public class UserController {
         userInfo.setUserId(userId);
         userService.updateUserInfo(userInfo);
         return JsonResponse.success();
+    }
+
+    // search the userInfo that has the keyword of nickname and mark (set the followed field as true)
+    // those that is followed by the current user and then return
+    @GetMapping("/user-infos")
+    public JsonResponse<PageResult<UserInfo>> pageListUserInfos(@RequestParam(name = "no") Integer pageNum, @RequestParam(name = "size") Integer pageSize, String nick){
+        Long userId = userSupport.getCurrentUserId();
+        JSONObject params = new JSONObject();
+        params.put("pageNum", pageNum);
+        params.put("pageSize", pageSize);
+        params.put("nickname", nick);
+        params.put("userId", userId);
+        PageResult<UserInfo> result = userService.pageListUserInfo(params);
+        if(result.getTotal() > 0){
+            List<UserInfo> checkedUserInfoList = userFollowingService.addUserInfoFollowedStatus(result.getList(), userId);
+            result.setList(checkedUserInfoList);
+        }
+        return new JsonResponse<>(result);
     }
 
     @PostMapping("/user-tokens")

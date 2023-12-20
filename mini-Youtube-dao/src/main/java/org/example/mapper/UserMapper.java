@@ -1,5 +1,6 @@
 package org.example.mapper;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.ibatis.annotations.*;
 import org.example.entity.User;
 
@@ -32,4 +33,5 @@ public interface UserMapper {
             "WHERE id = #{id}" +
             "</script>")
     void updateUser(User user);
+
 }
