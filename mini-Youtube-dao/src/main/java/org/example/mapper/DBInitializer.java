@@ -62,5 +62,89 @@ public interface DBInitializer {
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createUserFollowingTable();
 
+    @Update("DROP TABLE IF EXISTS t_user_moment;")
+    void dropUserMomentTable();
+
+    @Update("CREATE TABLE t_user_moment ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "userId bigint DEFAULT NULL, "
+            + "type varchar(5) DEFAULT NULL COMMENT 'moment type: 0 video "
+            + "1 livestreaming 2 user interaction', "
+            + "contentId bigint DEFAULT NULL, "
+            + "createdTime datetime DEFAULT NULL, "
+            + "updatedTime datetime DEFAULT NULL "
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createUserMomentTable();
+
+    @Update("DROP TABLE IF EXISTS t_auth_role")
+    void dropAuthRoleTable();
+
+    @Update("CREATE TABLE t_auth_role ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "name varchar(255) DEFAULT NULL, "
+            + "code varchar(50) DEFAULT NULL COMMENT 'different from name, e.g. name is Regular User "
+            + "while code is user. Use this rather than id in the code because this is human readable', "
+            + "createdTime datetime DEFAULT NULL, "
+            + "updatedTime datetime DEFAULT NULL "
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createAuthRoleTable();
+
+    @Update("DROP TABLE IF EXISTS t_user_role_association")
+    void dropUserRoleAssociationTable();
+
+    @Update("CREATE TABLE t_user_role_association ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "userId bigint DEFAULT NULL, "
+            + "roleId bigint DEFAULT NULL, "
+            + "createdTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createUserRoleAssociationTable();
+
+    @Update("DROP TABLE IF EXISTS t_auth_element_operation")
+    void dropAuthElementOperationTable();
+
+    @Update("CREATE TABLE t_auth_element_operation ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "elementName varchar(255) DEFAULT NULL, "
+            + "elementCode varchar(50) DEFAULT NULL, "
+            + "operationType varchar(5) DEFAULT NULL COMMENT '0 clickable 1 visible', "
+            + "createdTime datetime DEFAULT NULL, "
+            + "updatedTime datetime DEFAULT NULL "
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createAuthElementOperationTable();
+
+    @Update("DROP TABLE IF EXISTS t_element_operation_role_association")
+    void dropElementOperationRoleAssociationTable();
+
+    @Update("CREATE TABLE t_element_operation_role_association ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "elementOperationId bigint DEFAULT NULL, "
+            + "roleId bigint DEFAULT NULL, "
+            + "createdTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createElementOperationRoleAssociationTable();
+
+    @Update("DROP TABLE IF EXISTS t_auth_menu")
+    void dropAuthMenuTable();
+
+    @Update("CREATE TABLE t_auth_menu ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "menuName varchar(255) DEFAULT NULL, "
+            + "menuCode varchar(50) DEFAULT NULL, "
+            + "createdTime datetime DEFAULT NULL, "
+            + "updatedTime datetime DEFAULT NULL "
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createAuthMenuTable();
+
+    @Update("DROP TABLE IF EXISTS t_menu_role_association")
+    void dropMenuRoleAssociationTable();
+
+    @Update("CREATE TABLE t_menu_role_association ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "menuId bigint DEFAULT NULL, "
+            + "roleId bigint DEFAULT NULL, "
+            + "createdTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createMenuRoleAssociationTable();
 
 }

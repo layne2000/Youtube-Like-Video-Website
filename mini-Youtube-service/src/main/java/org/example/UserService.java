@@ -1,6 +1,7 @@
 package org.example;
 
 import com.alibaba.fastjson.JSONObject;
+import org.example.auth.UserAuthService;
 import org.example.entity.FollowingGroup;
 import org.example.entity.User;
 import org.example.entity.UserInfo;
@@ -13,6 +14,7 @@ import org.example.util.RSAUtil;
 import org.example.util.SHA256Util;
 import org.example.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,13 +28,16 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserInfoMapper userInfoMapper;
     private final FollowingGroupMapper followingGroupMapper;
+    private final UserAuthService userAuthService;
 
     //Starting with Spring 4.3, if a class has only one constructor, the @Autowired annotation is no longer required
     @Autowired
-    public UserService(UserMapper userMapper, UserInfoMapper userInfoMapper, FollowingGroupMapper followingGroupMapper) {
+    public UserService(UserMapper userMapper, UserInfoMapper userInfoMapper,
+                       FollowingGroupMapper followingGroupMapper, UserAuthService userAuthService) {
         this.userMapper = userMapper;
         this.userInfoMapper = userInfoMapper;
         this.followingGroupMapper =followingGroupMapper;
+        this.userAuthService = userAuthService;
     }
 
     @Transactional
@@ -79,6 +84,8 @@ public class UserService {
         defaultFollowingGroup.setCreatedTime(LocalDateTime.now());
         followingGroupMapper.addFollowingGroup(specialAttentionGroup);
         followingGroupMapper.addFollowingGroup(defaultFollowingGroup);
+        // add default roles
+        userAuthService.addUserDefaultRole(userId);
     }
 
     public String login(User user) throws Exception {

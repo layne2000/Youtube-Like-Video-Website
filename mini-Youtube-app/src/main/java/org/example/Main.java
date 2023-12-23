@@ -30,13 +30,27 @@ public class Main {
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
             DBInitializer databaseInitializer = sqlSession.getMapper(DBInitializer.class);
             databaseInitializer.dropUserTable();
-            databaseInitializer.dropUserInfoTable();
-            databaseInitializer.dropFollowingGroupTable();
-            databaseInitializer.dropUserFollowingTable();
             databaseInitializer.createUserTable();
+            databaseInitializer.dropUserInfoTable();
             databaseInitializer.createUserInfoTable();
+            databaseInitializer.dropFollowingGroupTable();
             databaseInitializer.createFollowingGroupTable();
+            databaseInitializer.dropUserFollowingTable();
             databaseInitializer.createUserFollowingTable();
+            databaseInitializer.dropUserMomentTable();
+            databaseInitializer.createUserMomentTable();
+            databaseInitializer.dropAuthRoleTable();
+            databaseInitializer.createAuthRoleTable();
+            databaseInitializer.dropUserRoleAssociationTable();
+            databaseInitializer.createUserRoleAssociationTable();
+            databaseInitializer.dropAuthElementOperationTable();
+            databaseInitializer.createAuthElementOperationTable();
+            databaseInitializer.dropElementOperationRoleAssociationTable();
+            databaseInitializer.createElementOperationRoleAssociationTable();
+            databaseInitializer.dropAuthMenuTable();
+            databaseInitializer.createAuthMenuTable();
+            databaseInitializer.dropMenuRoleAssociationTable();
+            databaseInitializer.createMenuRoleAssociationTable();
             sqlSession.commit();
             //sqlSession.close(); //sqlSession will be closed automatically after leaving try block
         }catch(Exception e){
