@@ -16,4 +16,10 @@ public interface UserRoleAssociationMapper {
     @Insert("INSERT INTO t_user_role_association(userId, roleId, createdTime) VALUES" +
             "(#{userId}, #{roleId}, #{createdTime})")
     void addUserRole(UserRoleAssociation userRole);
+
+    @Select("SELECT code " +
+            "FROM t_user_role_association AS ua LEFT JOIN t_auth_role AS ar " +
+            "ON ua.roleId = ar.id " +
+            "WHERE userId = #{userId}")
+    List<String> getRoleCodeListByUserId(Long userId);
 }

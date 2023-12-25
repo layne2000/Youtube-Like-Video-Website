@@ -1,6 +1,9 @@
 package org.example;
 
+import org.example.constant.AuthRoleConstant;
 import org.example.entity.UserMoment;
+import org.example.entity.annotation.ControllerLimitedRole;
+import org.example.entity.annotation.DataLimited;
 import org.example.util.JsonResponse;
 import org.example.util.UserSupport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,9 @@ public class UserMomentController {
         this.userMomentService = userMomentService;
     }
 
-    //TODO: more annotations needed
+    // "ROLE_LV0" is not allowed to post a video
+    @ControllerLimitedRole(limitedRoleCodeArray = {AuthRoleConstant.ROLE_LV1})
+    @DataLimited
     @PostMapping("/user-moments")
     public JsonResponse<String> addUserMoment(@RequestBody UserMoment userMoment) throws Exception {
         Long userId = userSupport.getCurrentUserId();

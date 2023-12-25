@@ -3,10 +3,12 @@ package org.example;
 import com.alibaba.fastjson.JSONObject;
 import org.example.auth.UserAuthService;
 import org.example.entity.FollowingGroup;
+import org.example.entity.RefreshToken;
 import org.example.entity.User;
 import org.example.entity.UserInfo;
 import org.example.exception.CustomizedException;
 import org.example.mapper.FollowingGroupMapper;
+import org.example.mapper.RefreshTokenMapper;
 import org.example.mapper.UserInfoMapper;
 import org.example.mapper.UserMapper;
 import org.example.util.PageResult;
@@ -19,8 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -29,15 +30,18 @@ public class UserService {
     private final UserInfoMapper userInfoMapper;
     private final FollowingGroupMapper followingGroupMapper;
     private final UserAuthService userAuthService;
+    private final RefreshTokenMapper refreshTokenMapper;
 
     //Starting with Spring 4.3, if a class has only one constructor, the @Autowired annotation is no longer required
     @Autowired
     public UserService(UserMapper userMapper, UserInfoMapper userInfoMapper,
-                       FollowingGroupMapper followingGroupMapper, UserAuthService userAuthService) {
+                       FollowingGroupMapper followingGroupMapper, UserAuthService userAuthService,
+                       RefreshTokenMapper refreshTokenMapper) {
         this.userMapper = userMapper;
         this.userInfoMapper = userInfoMapper;
         this.followingGroupMapper =followingGroupMapper;
         this.userAuthService = userAuthService;
+        this.refreshTokenMapper = refreshTokenMapper;
     }
 
     @Transactional
@@ -151,5 +155,48 @@ public class UserService {
         List<UserInfo> userInfoList = userInfoMapper.pageListUserInfo(params);
         Integer total = userInfoList.size();
         return new PageResult<>(total, userInfoList);
+    }
+
+    public Map<String, Object> loginForDts(User user) throws Exception {
+        String phone = user.getPhone();
+        String email = user.getEmail();
+        if ((phone == null || phone.equals("")) && (email == null || email.equals(""))) {
+            throw new CustomizedException("Phone and email are empty or null!");
+        }
+        User storedUser = userMapper.getUserByPhoneOrEmail(phone, email);
+        if (storedUser == null) {
+            throw new CustomizedException("User doesn't exist!");
+        }
+        String decryptedPwd;
+        try {
+            decryptedPwd = RSAUtil.decrypt(user.getPassword());
+        } catch (Exception e) {
+            throw new CustomizedException("RSA password decryption failed!");
+        }
+        if (!SHA256Util.verify(decryptedPwd, storedUser.getPassword(), storedUser.getSalt())) {
+            throw new CustomizedException("Incorrect password!");
+        }
+        Long userId = storedUser.getId();
+        String accessToken = TokenUtil.generateToken(userId);
+        String refreshToken = TokenUtil.generateRefreshToken(userId);
+        //add refresh token to DB
+        refreshTokenMapper.deleteRefreshTokenByUserId(userId);
+        refreshTokenMapper.addRefreshToken(userId, refreshToken, LocalDateTime.now());
+        Map<String, Object> ret = new HashMap<>();
+        ret.put("accessToken", accessToken);
+        ret.put("refreshToken", refreshToken);
+        return ret;
+    }
+
+    public void logout(Long userId, String refreshToken) {
+        refreshTokenMapper.deleteRefreshTokenByTokenAndUserId(userId, refreshToken);
+    }
+
+    public String refreshAccessToken(String refreshTokenStr) throws Exception {
+        RefreshToken refreshToken = refreshTokenMapper.getByRefreshTokenStr(refreshTokenStr);
+        if(refreshToken == null){
+            throw new CustomizedException("Invalid refreshToken!");
+        }
+        return TokenUtil.generateToken(refreshToken.getUserId());
     }
 }

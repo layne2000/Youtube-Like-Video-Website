@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.ibatis.annotations.*;
 import org.example.entity.User;
 
+import java.time.LocalDateTime;
+
 @Mapper
 public interface UserMapper {
     @Insert("INSERT INTO t_user (phone, email, password, salt, createdTime, updatedTime) " +

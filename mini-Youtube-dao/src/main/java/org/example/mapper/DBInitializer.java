@@ -147,4 +147,15 @@ public interface DBInitializer {
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createMenuRoleAssociationTable();
 
+    @Update("DROP TABLE IF EXISTS t_refresh_token")
+    void dropRefreshTokenTable();
+
+    @Update("CREATE TABLE t_refresh_token ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "userId bigint DEFAULT NULL, "
+            + "refreshToken varchar(500) DEFAULT NULL, "
+            + "createdTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createRefreshTokenTable();
+
 }

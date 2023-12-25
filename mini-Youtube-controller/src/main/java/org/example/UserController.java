@@ -1,6 +1,7 @@
 package org.example;
 
 import com.alibaba.fastjson.JSONObject;
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.entity.User;
 import org.example.entity.UserInfo;
 import org.example.util.JsonResponse;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class UserController {
@@ -83,6 +85,28 @@ public class UserController {
     public JsonResponse<String> login(@RequestBody User user) throws Exception {
         String token = userService.login(user);
         return new JsonResponse<>(token);
+    }
+
+    // dts means double tokens
+    @PostMapping("/user-dts")
+    public JsonResponse<Map<String, Object>> loginForDts(@RequestBody User user) throws Exception {
+        Map<String, Object> map = userService.loginForDts(user);
+        return new JsonResponse<>(map);
+    }
+
+    @DeleteMapping("/refresh-tokens")
+    public JsonResponse<String> logout(HttpServletRequest request){
+        String refreshToken = request.getHeader("refreshToken");
+        Long userId = userSupport.getCurrentUserId();
+        userService.logout(userId, refreshToken);
+        return JsonResponse.success();
+    }
+
+    @PostMapping("/access-tokens")
+    public JsonResponse<String> refreshAccessToken(HttpServletRequest request) throws Exception {
+        String refreshToken = request.getHeader("refreshToken");
+        String accessToken = userService.refreshAccessToken(refreshToken);
+        return new JsonResponse<>(accessToken);
     }
 
 }
