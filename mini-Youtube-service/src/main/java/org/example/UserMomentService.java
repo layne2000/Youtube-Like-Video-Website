@@ -21,7 +21,6 @@ import java.util.List;
 public class UserMomentService {
 
     private final ApplicationContext applicationContext;
-
     private final UserMomentMapper userMomentMapper;
     private final RedisTemplate<String, String> redisTemplate;
 

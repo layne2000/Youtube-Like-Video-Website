@@ -38,6 +38,7 @@ public class ControllerLimitedRoleAspect {
     public void check() {
     }
 
+    // && @annotation(controllerLimitedRole) allows to get info about the annotation
     @Before("check() && @annotation(controllerLimitedRole)")
     public void doBefore(JoinPoint joinPoint, ControllerLimitedRole controllerLimitedRole) {
         Long userId = userSupport.getCurrentUserId();

@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 @Documented
-@Component
+//@Component
 public @interface ControllerLimitedRole {
     // if not specified, empty string array by default
     String[] limitedRoleCodeArray()  default {};
