@@ -6,8 +6,8 @@ import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.message.Message;
 import org.example.constant.MQConstant;
 import org.example.entity.UserMoment;
-import org.example.util.RocketMQUtil;
 import org.example.mapper.UserMomentMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,23 +20,21 @@ import java.util.List;
 @Service
 public class UserMomentService {
 
-    private final ApplicationContext applicationContext;
     private final UserMomentMapper userMomentMapper;
     private final RedisTemplate<String, String> redisTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public UserMomentService(ApplicationContext applicationContext, UserMomentMapper userMomentMapper, RedisTemplate<String, String> redisTemplate){
-        this.applicationContext = applicationContext;
+    public UserMomentService(UserMomentMapper userMomentMapper, RedisTemplate<String, String> redisTemplate, RabbitTemplate rabbitTemplate){
         this.userMomentMapper = userMomentMapper;
         this.redisTemplate = redisTemplate;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void addUserMoment(UserMoment userMoment) throws Exception {
+    public void addUserMoment(UserMoment userMoment){
         userMoment.setCreatedTime(LocalDateTime.now());
         userMomentMapper.addUserMoment(userMoment);
-        DefaultMQProducer producer = (DefaultMQProducer)applicationContext.getBean("momentsProducer");
-        Message msg = new Message(MQConstant.TOPIC_MOMENTS, JSONObject.toJSONString(userMoment).getBytes(StandardCharsets.UTF_8));
-        RocketMQUtil.syncSendMsg(producer, msg);
+        rabbitTemplate.convertAndSend(MQConstant.QUEUE_MOMENTS, JSONObject.toJSONString(userMoment).getBytes(StandardCharsets.UTF_8));
     }
 
     public List<UserMoment> getUserSubscribedMoments(Long userId) {
