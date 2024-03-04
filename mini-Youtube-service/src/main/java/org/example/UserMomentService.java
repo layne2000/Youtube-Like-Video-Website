@@ -2,8 +2,6 @@ package org.example;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.rocketmq.client.producer.DefaultMQProducer;
-import org.apache.rocketmq.common.message.Message;
 import org.example.constant.MQConstant;
 import org.example.entity.UserMoment;
 import org.example.mapper.UserMomentMapper;

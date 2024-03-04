@@ -1,6 +1,10 @@
 package org.example.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -33,19 +37,6 @@ public class SHA256Util {
         return newHashedStr.equals(storedHashedStr);
     }
 
-    //    //获取文件md5加密后的字符串 // TODO: modify it later
-//    public static String getFileMD5(MultipartFile file) throws Exception {
-//        InputStream fis = file.getInputStream();
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        byte[] buffer = new byte[1024];
-//        int byteRead;
-//        while((byteRead = fis.read(buffer)) > 0){
-//            baos.write(buffer, 0, byteRead);
-//        }
-//        fis.close();
-//        return DigestUtils.md5Hex(baos.toByteArray());
-//    }
-
     private static String bytesArrayToHexString(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte aByte : bytes) {
@@ -62,6 +53,26 @@ public class SHA256Util {
                     + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
+    }
+
+    //TODO: to be verified
+    public static String getFileSHA256(MultipartFile file) throws Exception {
+        // 创建 SHA256 摘要算法实例
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        // 获取文件的字节数组
+        byte[] fileBytes = file.getBytes();
+        // 更新摘要算法实例的输入
+        digest.update(fileBytes);
+        // calculate hash values
+        byte[] hashBytes = digest.digest();
+        // convert hash values to hex string
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hashBytes) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
 }

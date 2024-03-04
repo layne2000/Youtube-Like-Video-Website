@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class UserAuth {
+public class UserAuthController {
 
     private final UserSupport userSupport;
     private final UserAuthService userAuthService;
     @Autowired
-    public UserAuth(UserSupport userSupport, UserAuthService userAuthService){
+    public UserAuthController(UserSupport userSupport, UserAuthService userAuthService){
         this.userSupport = userSupport;
         this.userAuthService = userAuthService;
     }

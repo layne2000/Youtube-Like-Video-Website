@@ -158,4 +158,65 @@ public interface DBInitializer {
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createRefreshTokenTable();
 
+    @Update("DROP TABLE IF EXISTS t_file")
+    void dropFileTable();
+
+    @Update("CREATE TABLE t_file ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "url varchar(500) DEFAULT NULL, "
+            + "type varchar(5) DEFAULT NULL, "
+            + "SHA256 varchar(500) DEFAULT NULL, "
+            + "createdTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createFileTable();
+
+    @Update("DROP TABLE IF EXISTS t_video")
+    void dropVideoTable();
+
+    @Update("CREATE TABLE t_video ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "userId bigint NOT NULL, "
+            + "url varchar(500) NOT NULL, "
+            + "thumbnail varchar(500) NOT NULL COMMENT 'video thumbnail url', "
+            + "title varchar(255) NOT NULL, "
+            + "type varchar(5) NOT NULL COMMENT '0 self-made 1 shared', "
+            + "duration bigint NOT NULL, "
+            + "section varchar(5) DEFAULT NULL COMMENT '0 music 1 movie 2 funny', "
+            + "description text DEFAULT NULL, "
+            + "createdTime datetime DEFAULT NULL, "
+            + "updatedTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createVideoTable();
+
+    @Update("DROP TABLE IF EXISTS t_tag")
+    void dropTagTable();
+
+    @Update("CREATE TABLE t_tag ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "name varchar(500) NOT NULL, "
+            + "createdTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createTagTable();
+
+    @Update("DROP TABLE IF EXISTS t_video_tag_association")
+    void dropVideoTagAssociationTable();
+
+    @Update("CREATE TABLE t_video_tag_association ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "videoId bigint NOT NULL, "
+            + "tagId bigint NOT NULL, "
+            + "createdTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createVideoTagAssociationTable();
+
+    @Update("DROP TABLE IF EXISTS t_video_like")
+    void dropVideoLikeTable();
+
+    @Update("CREATE TABLE t_video_like ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "videoId bigint NOT NULL, "
+            + "userId bigint NOT NULL, "
+            + "createdTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createVideoLikeTable();
 }
