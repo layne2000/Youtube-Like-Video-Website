@@ -19,4 +19,7 @@ public interface VideoMapper {
     @Select("SELECT * FROM t_video WHERE 1=1 <if test=\"section != null and section != '' \"> AND section = #{section}</if>" +
             "ORDER BY id DESC LIMIT #{start}, #{limit}")
     List<Video> pageListVideos(Map<String, Object> mapperParams);
+
+    @Select("SELECT * FROM t_video WHERE id = #{id} FOR UPDATE")
+    Video getVideoById(Long id);
 }

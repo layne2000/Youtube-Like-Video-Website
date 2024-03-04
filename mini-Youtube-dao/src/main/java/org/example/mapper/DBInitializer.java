@@ -219,4 +219,55 @@ public interface DBInitializer {
             + "createdTime datetime DEFAULT NULL"
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createVideoLikeTable();
+
+    @Update("DROP TABLE IF EXISTS t_collection_group")
+    void dropCollectionGroupTable();
+
+    @Update("CREATE TABLE t_collection_group ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "userId bigint NOT NULL, "
+            + "name varchar(50) DEFAULT NULL, "
+            + "type varchar(2) DEFAULT NULL COMMENT '0 default 1 customized', "
+            + "createdTime datetime DEFAULT NULL"
+            + "updatedTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createCollectionGroupTable();
+
+    @Update("DROP TABLE IF EXISTS t_video_collection")
+    void dropVideoCollectionTable();
+
+    @Update("CREATE TABLE t_video_collection ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "videoId bigint NOT NULL, "
+            + "userId bigint NOT NULL, "
+            + "groupId bigint NOT NULL, "
+            + "createdTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createVideoCollectionTable();
+
+    @Update("DROP TABLE IF EXISTS t_user_coin")
+    void dropUserCoinTable();
+
+    @Update("CREATE TABLE t_user_coin ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "userId bigint NOT NULL, "
+            + "amount bigint NOT NULL DEFAULT 0, "
+            + "createdTime datetime DEFAULT NULL"
+            + "updatedTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createUserCoinTable();
+
+    @Update("DROP TABLE IF EXISTS t_video_coin")
+    void dropVideoCoinTable();
+
+    @Update("CREATE TABLE t_video_coin ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "videoId bigint NOT NULL, "
+            + "userId bigint NOT NULL, "
+            + "amount bigint NOT NULL DEFAULT 0, "
+            + "createdTime datetime DEFAULT NULL"
+            + "updatedTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createVideoCoinTable();
+
 }
