@@ -270,4 +270,18 @@ public interface DBInitializer {
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createVideoCoinTable();
 
+    @Update("DROP TABLE IF EXISTS t_video_comment")
+    void dropVideoCommentTable();
+
+    @Update("CREATE TABLE t_video_comment ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "videoId bigint NOT NULL, "
+            + "userId bigint NOT NULL, "
+            + "replyUserId bigint NOT NULL DEFAULT 0 COMMENT 'the user replied by this comment', "
+            + "rootCommentId bigint DEFAULT NULL, "
+            + "content text DEFAULT NULL, "
+            + "createdTime datetime DEFAULT NULL"
+            + "updatedTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createVideoCommentTable();
 }

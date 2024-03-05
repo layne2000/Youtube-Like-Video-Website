@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Update;
 import org.example.entity.UserInfo;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface UserInfoMapper {
@@ -42,4 +43,13 @@ public interface UserInfoMapper {
             "LIMIT #{start}, #{pageSize} " +
              "</script>")
     List<UserInfo> pageListUserInfo(JSONObject params);
+
+    @Select("<script>" +
+            "SELECT *" +
+            "FROM t_user_info WHERE rootCommentId IN " +
+            "<foreach item='userId' collection='userIdSet' open='(' separator=',' close=')'>" +
+            "#{userId}" +
+            "</foreach>" +
+            "</script>")
+    List<UserInfo> getUserInfoListByUserIdSet(Set<Long> userIdSet);
 }

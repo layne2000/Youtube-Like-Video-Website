@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.example.entity.Video;
 import org.example.entity.VideoCoin;
 import org.example.entity.VideoCollection;
+import org.example.entity.VideoComment;
 import org.example.util.JsonResponse;
 import org.example.util.PageResult;
 import org.example.util.UserSupport;
@@ -122,4 +123,18 @@ public class VideoController {
         return new JsonResponse<>(result);
     }
 
+    @PostMapping("/video-comments")
+    public JsonResponse<String> addVideoComment(@RequestBody VideoComment videoComment){
+        Long userId = userSupport.getCurrentUserId();
+        videoService.insertVideoComment(videoComment, userId);
+        return JsonResponse.success();
+    }
+
+    @GetMapping("/video-comments")
+    public JsonResponse<PageResult<VideoComment>> pageListVideoComments(@RequestParam Integer size,
+                                                                        @RequestParam Integer num,
+                                                                        @RequestParam Long videoId){
+        PageResult<VideoComment> result = videoService.pageListVideoComments(size, num, videoId);
+        return new JsonResponse<>(result);
+    }
 }

@@ -13,10 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class VideoService {
@@ -27,11 +25,14 @@ public class VideoService {
     private final VideoCollectionMapper videoCollectionMapper;
     private final UserCoinMapper userCoinMapper;
     private final VideoCoinMapper videoCoinMapper;
+    private final VideoCommentMapper videoCommentMapper;
+    private final UserInfoMapper userInfoMapper;
     @Autowired
     VideoService(VideoMapper videoMapper, VideoTagMapper videoTagMapper,
                  FastDFSUtil fastDFSUtil, VideoLikeMapper videoLikeMapper,
                  VideoCollectionMapper videoCollectionMapper, UserCoinMapper userCoinMapper,
-                 VideoCoinMapper videoCoinMapper){
+                 VideoCoinMapper videoCoinMapper, VideoCommentMapper videoCommentMapper,
+                 UserInfoMapper userInfoMapper){
         this.videoMapper = videoMapper;
         this.videoTagMapper = videoTagMapper;
         this.fastDFSUtil = fastDFSUtil;
@@ -39,6 +40,8 @@ public class VideoService {
         this.videoCollectionMapper = videoCollectionMapper;
         this.userCoinMapper = userCoinMapper;
         this.videoCoinMapper = videoCoinMapper;
+        this.videoCommentMapper = videoCommentMapper;
+        this.userInfoMapper = userInfoMapper;
     }
 
     @Transactional
@@ -170,5 +173,62 @@ public class VideoService {
         res.put("count", count);
         res.put("hasGivenCoin", hasGivenCoin);
         return res;
+    }
+
+
+    public void insertVideoComment(VideoComment videoComment, Long userId) {
+        Long videoId = videoComment.getVideoId();
+        if(videoId == null){
+            throw new CustomizedException("Invalid param");
+        }
+        if(videoMapper.getVideoById(videoId) == null){
+            throw new CustomizedException("Invalid video");
+        }
+        //TODO: setUserId is needed??
+        videoComment.setUserId(userId);
+        videoComment.setCreatedTime(LocalDateTime.now());
+        videoCommentMapper.insertVideoComment(videoComment);
+    }
+
+    public PageResult<VideoComment> pageListVideoComments(Integer size, Integer num, Long videoId) {
+        if(videoId == null){
+            throw new CustomizedException("Invalid param");
+        }
+        if(videoMapper.getVideoById(videoId) == null){
+            throw new CustomizedException("Invalid video");
+        }
+        Map<String, Object> videoCommentParams = new HashMap<>();
+        videoCommentParams .put("start", (num - 1) * size);
+        videoCommentParams.put("limit", size);
+        videoCommentParams.put("videoId", videoId);
+        List<VideoComment> resList = videoCommentMapper.pageListRootVideoComments(videoCommentParams);
+        Integer total = resList.size(); // TODO: different?
+
+        List<Long> rootCommentIdList = resList.stream().map(VideoComment::getId).toList();
+        // all roots' child comments including comment to child comment
+        List<VideoComment> childCommentList = videoCommentMapper.getVidoCommentListByRootCommentIdList(rootCommentIdList);
+
+        // to get userInfoMap for both root comments and child comments' user
+        Set<Long> userIdSet = childCommentList.stream().map(VideoComment::getUserId).collect(Collectors.toSet());
+        userIdSet.addAll(childCommentList.stream().map(VideoComment::getUserId).collect(Collectors.toSet()));
+        //TODO: no need to add its replyUser because all the users are here?
+        List<UserInfo> userInfoList = userInfoMapper.getUserInfoListByUserIdSet(userIdSet);
+        Map<Long, UserInfo> userInfoMap = userInfoList.stream().collect(Collectors.toMap(UserInfo::getUserId, userInfo -> userInfo));
+
+        // fill in its childList, userInfo
+        resList.forEach(videoComment -> {
+            Long id = videoComment.getId();
+            List<VideoComment> childList = new ArrayList<>();
+            childCommentList.forEach(childComment ->{//TODO: why not search in the DB right now
+                if(id.equals(childComment.getRootCommentId())){
+                    childComment.setUserInfo(userInfoMap.get(childComment.getUserId()));
+                    childComment.setReplyUserInfo(userInfoMap.get(childComment.getReplyUserId()));
+                    childList.add(childComment);
+                }
+            });
+            videoComment.setChildList(childList);
+            videoComment.setUserInfo(userInfoMap.get(videoComment.getUserId()));
+        });
+        return new PageResult<>(total, resList);
     }
 }
