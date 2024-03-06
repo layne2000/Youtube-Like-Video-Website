@@ -8,7 +8,10 @@ import org.example.mapper.DBInitializer;
 import org.example.mapper.auth.AuthRoleMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +20,8 @@ import java.time.LocalDateTime;
 import static java.lang.System.exit;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.example"})
+@EnableAsync
+@EnableScheduling
 public class Main {
     public static void main(String[] args) {
         //traditional mybatis approach to initialize DB
@@ -74,7 +78,8 @@ public class Main {
             System.out.println("Can't connect to the database");
             exit(1);
         }
-        SpringApplication.run(Main.class, args);
+        ApplicationContext app = SpringApplication.run(Main.class, args);
+        WebSocketService.setApplicationContext(app);
     }
 
 }

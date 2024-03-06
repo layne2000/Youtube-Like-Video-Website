@@ -284,4 +284,17 @@ public interface DBInitializer {
             + "updatedTime datetime DEFAULT NULL"
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createVideoCommentTable();
+
+    @Update("DROP TABLE IF EXISTS t_live_comment")
+    void dropLiveCommentTable();
+
+    @Update("CREATE TABLE t_live_comment ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "videoId bigint NOT NULL, "
+            + "userId bigint NOT NULL, "
+            + "content text DEFAULT NULL, "
+            + "appearingTime varchar(50) DEFAULT NULL"
+            + "createdTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createLiveCommentTable();
 }

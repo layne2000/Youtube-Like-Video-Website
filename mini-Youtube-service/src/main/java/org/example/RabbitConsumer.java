@@ -1,4 +1,4 @@
-package org.example.config;
+package org.example;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class MessageConsumer {
+public class RabbitConsumer {
     private final RedisTemplate<String, String> redisTemplate;
 
     private final UserFollowingService userFollowingService;
 
     @Autowired
-    MessageConsumer(RedisTemplate<String, String> redisTemplate, UserFollowingService userFollowingService){
+    RabbitConsumer(RedisTemplate<String, String> redisTemplate, UserFollowingService userFollowingService){
         this.redisTemplate = redisTemplate;
         this.userFollowingService = userFollowingService;
     }

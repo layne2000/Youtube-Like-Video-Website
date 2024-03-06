@@ -10,4 +10,9 @@ public class RabbitMQConfig {
     public Queue momentsQueue(){
         return new Queue("momentsQueue");
     }
+
+    @Bean
+    public Queue liveCommentsQueue(){
+        return new Queue("liveCommentsQueue");
+    }
 }

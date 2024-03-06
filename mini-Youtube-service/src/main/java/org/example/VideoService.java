@@ -231,4 +231,19 @@ public class VideoService {
         });
         return new PageResult<>(total, resList);
     }
+
+    public Map<String, Object> getVideoDetails(Long videoId) {
+        if(videoId == null){
+            throw new CustomizedException("Invalid parameter");
+        }
+        Video video = videoMapper.getVideoById(videoId);
+        if(video == null){
+            throw new CustomizedException("Invalid video");
+        }
+        UserInfo userInfo = userInfoMapper.getUserInfoByUserId(video.getUserId());
+        Map<String, Object> res = new HashMap<>();
+        res.put("video", video);
+        res.put("userInfo", userInfo);
+        return res;
+    }
 }
