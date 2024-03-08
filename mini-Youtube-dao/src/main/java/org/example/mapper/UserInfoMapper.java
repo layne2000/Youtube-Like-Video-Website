@@ -46,7 +46,7 @@ public interface UserInfoMapper {
 
     @Select("<script>" +
             "SELECT *" +
-            "FROM t_user_info WHERE rootCommentId IN " +
+            "FROM t_user_info WHERE userId IN " +
             "<foreach item='userId' collection='userIdSet' open='(' separator=',' close=')'>" +
             "#{userId}" +
             "</foreach>" +

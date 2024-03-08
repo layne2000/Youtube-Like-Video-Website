@@ -9,10 +9,8 @@ import org.example.util.JsonResponse;
 import org.example.util.PageResult;
 import org.example.util.UserSupport;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +46,7 @@ public class VideoController {
         return new JsonResponse<>(result);
     }
 
+    //TODO: to be tested
     @GetMapping("/video-slices")
     public void viewVideoOnlineBySlices(HttpServletRequest request,
                                         HttpServletResponse response,
@@ -80,6 +79,10 @@ public class VideoController {
         return new JsonResponse<>(result);
     }
 
+    //TODO: add CRUD for collection group and corresponding check in videoCollection api
+
+    // multiple insertion would lead to deletion and then insertion
+    // (user can collect the same video in only one group
     @PostMapping("/video-collections")
     public JsonResponse<String> addVideoCollection(@RequestBody VideoCollection videoCollection){
         Long userId = userSupport.getCurrentUserId();
@@ -104,6 +107,8 @@ public class VideoController {
         return new JsonResponse<>(result);
     }
 
+    //TODO:add CRUD for userCoin
+
     // allow giving more than 1 coin
     @PostMapping("/video-coins")
     public JsonResponse<String> addVideoCoin(@RequestBody VideoCoin videoCoin){
@@ -122,6 +127,7 @@ public class VideoController {
         return new JsonResponse<>(result);
     }
 
+    // root video comment's rootCommentId should be NULL
     @PostMapping("/video-comments")
     public JsonResponse<String> addVideoComment(@RequestBody VideoComment videoComment){
         Long userId = userSupport.getCurrentUserId();
@@ -143,7 +149,7 @@ public class VideoController {
         return new JsonResponse<>(result);
     }
 
-    //TODO: request body?
+    //TODO: verify the videoId?
     @PostMapping("/video-views")
     public JsonResponse<String> addVideoView(@RequestBody VideoView videoView,
                                              HttpServletRequest request){
@@ -166,8 +172,8 @@ public class VideoController {
 
 
     @GetMapping("/video-tags")
-    public JsonResponse<List<VideoTag>> getVideoTagsByVideoId(@RequestParam Long videoId) {
-        List<VideoTag> list = videoService.getVideoTagListByVideoId(videoId);
+    public JsonResponse<List<VideoTagAssociation>> getVideoTagsByVideoId(@RequestParam Long videoId) {
+        List<VideoTagAssociation> list = videoService.getVideoTagListByVideoId(videoId);
         return new JsonResponse<>(list);
     }
 

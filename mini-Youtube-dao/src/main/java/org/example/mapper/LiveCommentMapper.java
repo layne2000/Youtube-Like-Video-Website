@@ -18,21 +18,21 @@ public interface LiveCommentMapper {
 
     @SelectProvider(type = LiveCommentSqlProvider.class, method = "getLiveCommentList")
     List<LiveComment> getLiveCommentList(Map<String, Object> liveCommentParams);
-}
 
-class LiveCommentSqlProvider {
+    class LiveCommentSqlProvider {
 
-    public String getLiveCommentList(Map<String, Object> params) {
-        return new SQL() {{
-            SELECT("*");
-            FROM("t_live_comment");
-            WHERE("videoId = #{videoId}");
-            if (params.get("startTime") != null && !params.get("startTime").equals("")) {
-                WHERE("appearingTime >= #{startTime}");
-            }
-            if (params.get("endTime") != null && !params.get("endTime").equals("")) {
-                WHERE("appearingTime <= #{endTime}");
-            }
-        }}.toString();
+        public String getLiveCommentList(Map<String, Object> params) {
+            return new SQL() {{
+                SELECT("*");
+                FROM("t_live_comment");
+                WHERE("videoId = #{videoId}");
+                if (params.get("startTime") != null && !params.get("startTime").equals("")) {
+                    WHERE("appearingTime >= #{startTime}");
+                }
+                if (params.get("endTime") != null && !params.get("endTime").equals("")) {
+                    WHERE("appearingTime <= #{endTime}");
+                }
+            }}.toString();
+        }
     }
 }

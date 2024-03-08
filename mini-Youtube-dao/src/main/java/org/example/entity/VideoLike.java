@@ -14,6 +14,13 @@ public class VideoLike {
         this.createdTime = createdTime;
     }
 
+    public VideoLike(Long id, Long userId, Long videoId, LocalDateTime createdTime) {
+        this.id = id;
+        this.userId = userId;
+        this.videoId = videoId;
+        this.createdTime = createdTime;
+    }
+
     public Long getId() {
         return id;
     }

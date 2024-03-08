@@ -13,11 +13,17 @@ public interface VideoMapper {
             "VALUES(#{userId}, #{url}, #{thumbnail}, #{title}, #{type}, #{duration}, #{section}, #{description}, #{createdTime}, #{updatedTime})")
     void insertVideo(Video video);
 
-    @Select("SELECT count(*) FROM t_video WHERE 1=1 <if test=\"section != null and section != '' \"> AND section = #{section}</if>")
+    @Select("<script>" +
+            "SELECT count(*) FROM t_video WHERE 1=1 " +
+            "<if test=\"section != null and section != '' \"> AND section = #{section}</if>" +
+            "</script>")
     Integer countVideosBySection(String section);
 
-    @Select("SELECT * FROM t_video WHERE 1=1 <if test=\"section != null and section != '' \"> AND section = #{section}</if>" +
-            "ORDER BY id DESC LIMIT #{start}, #{limit}")
+    @Select("<script>" +
+            "SELECT * FROM t_video WHERE 1=1 " +
+            "<if test=\"section != null and section != '' \"> AND section = #{section}</if>" +
+            "ORDER BY id DESC LIMIT #{start}, #{limit}" +
+            "</script>")
     List<Video> pageListVideos(Map<String, Object> mapperParams);
 
     @Select("SELECT * FROM t_video WHERE id = #{id} FOR UPDATE")

@@ -3,7 +3,6 @@ package org.example;
 import eu.bitwalker.useragentutils.UserAgent;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.ibatis.annotations.Select;
 import org.example.entity.*;
 import org.example.exception.CustomizedException;
 import org.example.mapper.*;
@@ -53,12 +52,14 @@ public class VideoService {
     public void addVideo(Video video) {
         video.setCreatedTime(LocalDateTime.now());
         videoMapper.insertVideo(video);
-        List<VideoTag> videoTagList = video.getVideoTagList();
-        videoTagList.forEach(item -> {
-            item.setCreatedTime(LocalDateTime.now());
-            item.setVideoId(video.getId());
-        });
-        videoTagMapper.addVideoTagList(videoTagList);
+        List<VideoTagAssociation> videoTagAssociationList = video.getVideoTagList();
+        if(videoTagAssociationList != null){
+            videoTagAssociationList.forEach(item -> {
+                item.setCreatedTime(LocalDateTime.now());
+                item.setVideoId(video.getId());
+            });
+            videoTagMapper.addVideoTagList(videoTagAssociationList);
+        }
     }
 
     public PageResult<Video> pageListVideos(Integer size, Integer num, String section) {
@@ -152,12 +153,13 @@ public class VideoService {
         // check if use has enough coins
         Long videoCoinAmount = videoCoin.getAmount(); // coin num given by this user
         Long userCoinAmount = userCoinMapper.getAmountByUserId(userId);
-        if(userCoinAmount < videoCoinAmount){
+        if(userCoinAmount == null || userCoinAmount < videoCoinAmount){
             throw new CustomizedException("Not enough coins");
         }
         VideoCoin dbVideoCoin = videoCoinMapper.getVideoCoinByVideoIdAndUserId(videoId, userId);
         // TODO: totally different?
         if(dbVideoCoin == null){ // user haven't given this video coin before
+            dbVideoCoin = new VideoCoin();
             dbVideoCoin.setUserId(userId);
             dbVideoCoin.setVideoId(videoId);
             dbVideoCoin.setAmount(videoCoinAmount);
@@ -180,7 +182,7 @@ public class VideoService {
         return res;
     }
 
-
+    @Transactional
     public void insertVideoComment(VideoComment videoComment, Long userId) {
         Long videoId = videoComment.getVideoId();
         if(videoId == null){
@@ -189,7 +191,6 @@ public class VideoService {
         if(videoMapper.getVideoById(videoId) == null){
             throw new CustomizedException("Invalid video");
         }
-        //TODO: setUserId is needed??
         videoComment.setUserId(userId);
         videoComment.setCreatedTime(LocalDateTime.now());
         videoCommentMapper.insertVideoComment(videoComment);
@@ -203,18 +204,26 @@ public class VideoService {
             throw new CustomizedException("Invalid video");
         }
         Map<String, Object> videoCommentParams = new HashMap<>();
-        videoCommentParams .put("start", (num - 1) * size);
+        videoCommentParams.put("start", (num - 1) * size);
         videoCommentParams.put("limit", size);
         videoCommentParams.put("videoId", videoId);
         List<VideoComment> resList = videoCommentMapper.pageListRootVideoComments(videoCommentParams);
-        Integer total = resList.size(); // TODO: different?
+        Integer total = videoCommentMapper.getRootCommentNumByVideoId(videoId); // TODO: difference?
+        if(resList.size() == 0){
+            return new PageResult<>(total, resList);
+        }
 
         List<Long> rootCommentIdList = resList.stream().map(VideoComment::getId).toList();
         // all roots' child comments including comment to child comment
-        List<VideoComment> childCommentList = videoCommentMapper.getVidoCommentListByRootCommentIdList(rootCommentIdList);
+        List<VideoComment> childCommentList;
+        if(!rootCommentIdList.isEmpty()){
+            childCommentList = videoCommentMapper.getVidoCommentListByRootCommentIdList(rootCommentIdList);
+        } else {
+            childCommentList = new ArrayList<>();
+        }
 
         // to get userInfoMap for both root comments and child comments' user
-        Set<Long> userIdSet = childCommentList.stream().map(VideoComment::getUserId).collect(Collectors.toSet());
+        Set<Long> userIdSet = resList.stream().map(VideoComment::getUserId).collect(Collectors.toSet());
         userIdSet.addAll(childCommentList.stream().map(VideoComment::getUserId).collect(Collectors.toSet()));
         //TODO: no need to add its replyUser because all the users are here?
         List<UserInfo> userInfoList = userInfoMapper.getUserInfoListByUserIdSet(userIdSet);
@@ -224,7 +233,7 @@ public class VideoService {
         resList.forEach(videoComment -> {
             Long id = videoComment.getId();
             List<VideoComment> childList = new ArrayList<>();
-            childCommentList.forEach(childComment ->{//TODO: why not search in the DB right now
+            childCommentList.forEach(childComment ->{//TODO: search in the DB right now?
                 if(id.equals(childComment.getRootCommentId())){
                     childComment.setUserInfo(userInfoMap.get(childComment.getUserId()));
                     childComment.setReplyUserInfo(userInfoMap.get(childComment.getReplyUserId()));
@@ -252,7 +261,7 @@ public class VideoService {
         return res;
     }
 
-    public List<VideoTag> getVideoTagListByVideoId(Long videoId) {
+    public List<VideoTagAssociation> getVideoTagListByVideoId(Long videoId) {
         if(videoId == null){
             throw new CustomizedException("Invalid parameter");
         }
@@ -274,6 +283,7 @@ public class VideoService {
         videoTagMapper.deleteVideoTagsByTagIdList(tagIdList, videoId);
     }
 
+    @Transactional
     public void addVideoView(VideoView videoView, HttpServletRequest request) {
         Long userId = videoView.getUserId();
         Long videoId = videoView.getVideoId();

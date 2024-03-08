@@ -1,7 +1,7 @@
 package org.example.mapper;
 
 import org.apache.ibatis.annotations.*;
-import org.example.entity.VideoTag;
+import org.example.entity.VideoTagAssociation;
 
 import java.util.List;
 
@@ -9,33 +9,33 @@ import java.util.List;
 public interface VideoTagMapper {
 
     @InsertProvider(type = VideoTagListSqlProvider.class, method = "insertVideoTagListSql")
-    void addVideoTagList(@Param("videoTagList")List<VideoTag> videoTagList);
+    void addVideoTagList(@Param("videoTagAssociationList")List<VideoTagAssociation> videoTagAssociationList);
 
-    @Select("SELECT * FROM t_video_tag WHERE videoId = #{videoId}")
-    List<VideoTag> getVideoTagListByVideoId(Long videoId);
+    @Select("SELECT * FROM t_video_tag_association WHERE videoId = #{videoId}")
+    List<VideoTagAssociation> getVideoTagListByVideoId(Long videoId);
 
-    @Select("<script>" +
-            "SELECT *" +
-            "FROM t_video_tag WHERE videoId = #{videoId} AND tagId IN " +
+    @Delete("<script>" +
+            "DELETE FROM t_video_tag_association WHERE videoId = #{videoId} AND tagId IN " +
             "<foreach item='tagId' collection='tagIdList' open='(' separator=',' close=')'>" +
             "#{tagId}" +
             "</foreach>" +
             "</script>")
     void deleteVideoTagsByTagIdList(List<Long> tagIdList, Long videoId);
-}
 
-class VideoTagListSqlProvider {
+    class VideoTagListSqlProvider {
 
-    public String insertVideoTagListSql(@Param("videoTagList") List<VideoTag> videoTagList) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO t_video_tag (videoId, tagId, createdTime) VALUES ");
-        for (int i = 0; i < videoTagList.size(); i++) {
-            if (i > 0) {
-                sql.append(",");
+        public String insertVideoTagListSql(@Param("videoTagAssociationList") List<VideoTagAssociation> videoTagAssociationList) {
+            StringBuilder sql = new StringBuilder();
+            sql.append("INSERT INTO t_video_tag_association (videoId, tagId, createdTime) VALUES ");
+            for (int i = 0; i < videoTagAssociationList.size(); i++) {
+                if (i > 0) {
+                    sql.append(",");
+                }
+                sql.append("(#{videoTagAssociationList[").append(i).append("].videoId}, #{videoTagAssociationList[").append(i).
+                        append("].tagId}, #{videoTagAssociationList[").append(i).append("].createdTime})");
             }
-            sql.append("(#{videoTagList[").append(i).append("].videoId}, #{videoTagList[").append(i).
-                    append("].tagId}, #{videoTagList[").append(i).append("].createdTime})");
+            return sql.toString();
         }
-        return sql.toString();
     }
 }
+

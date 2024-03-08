@@ -21,24 +21,26 @@ public interface VideoViewMapper {
 
     @SelectProvider(type = VideoViewSqlProvider.class, method = "getVideoView")
     VideoView getVideoView(Map<String, Object> params);
-}
 
-class VideoViewSqlProvider{
-    public String getVideoView(Map<String, Object> params){
-        return new SQL() {{
-            SELECT("*");
-            FROM("t_video_view");
-            WHERE("videoId = #{videoId} AND DATE(createdTime) = #{today}");
-            if (params.get("userId") != null) {
-                WHERE("userId = #{userId}");
-            }else{
-                if (params.get("clientId") != null && !params.get("clientId").equals("")) {
-                    WHERE("clientId = #{clientId}");
+    class VideoViewSqlProvider{
+        public String getVideoView(Map<String, Object> params){
+            return new SQL() {{
+                SELECT("*");
+                FROM("t_video_view");
+                WHERE("videoId = #{videoId} AND DATE(createdTime) = #{today}");
+                if (params.get("userId") != null) {
+                    WHERE("userId = #{userId}");
+                }else{
+                    if (params.get("clientId") != null && !params.get("clientId").equals("")) {
+                        WHERE("clientId = #{clientId}");
+                    }
+                    if (params.get("ip") != null && !params.get("ip").equals("")) {
+                        WHERE("ip = #{ip}");
+                    }
                 }
-                if (params.get("ip") != null && !params.get("ip").equals("")) {
-                    WHERE("ip = #{ip}");
-                }
-            }
-        }}.toString();
+            }}.toString() + " FOR UPDATE";
+        }
     }
 }
+
+

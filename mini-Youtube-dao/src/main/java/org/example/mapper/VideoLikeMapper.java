@@ -12,7 +12,7 @@ public interface VideoLikeMapper {
     VideoLike getVideoLikeByUserIdAndVideoId(Long userId, Long videoId);
 
     @Insert("INSERT INTO t_video_like (userId, videoId, createdTime) " +
-            "VALUES(#{userid}, #{videoId}, #{createdTime})" )
+            "VALUES(#{userId}, #{videoId}, #{createdTime})" )
     void insertVideoLike(VideoLike videoLike);
 
     @Delete("DELETE FROM t_video_like WHERE userId = #{userId} AND videoId = #{videoId}")

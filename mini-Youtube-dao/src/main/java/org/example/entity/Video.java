@@ -6,7 +6,6 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Document(indexName = "videos")
@@ -39,7 +38,7 @@ public class Video {
     @Field(type = FieldType.Date)
     private LocalDateTime updatedTime;
 
-    private List<VideoTag> videoTagList;
+    private List<VideoTagAssociation> videoTagAssociationList;
     public Long getId() {
         return id;
     }
@@ -84,8 +83,8 @@ public class Video {
         return updatedTime;
     }
 
-    public List<VideoTag> getVideoTagList() {
-        return videoTagList;
+    public List<VideoTagAssociation> getVideoTagList() {
+        return videoTagAssociationList;
     }
 
     public void setId(Long id) {
@@ -132,7 +131,7 @@ public class Video {
         this.updatedTime = updatedTime;
     }
 
-    public void setVideoTagList(List<VideoTag> videoTagList) {
-        this.videoTagList = videoTagList;
+    public void setVideoTagList(List<VideoTagAssociation> videoTagAssociationList) {
+        this.videoTagAssociationList = videoTagAssociationList;
     }
 }

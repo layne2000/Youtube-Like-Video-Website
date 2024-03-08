@@ -2,7 +2,7 @@ package org.example.entity;
 
 import java.time.LocalDateTime;
 
-public class VideoTag {
+public class VideoTagAssociation {
     private Long id;
     private Long videoId;
     private Long tagId;
