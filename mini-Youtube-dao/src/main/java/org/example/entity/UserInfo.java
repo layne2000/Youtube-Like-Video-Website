@@ -1,16 +1,26 @@
 package org.example.entity;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+
 import java.time.LocalDateTime;
 
+@Document(indexName = "user-infos")
 public class UserInfo {
+    @Id
     private Long id;
     private Long userId;
+    @Field(type = FieldType.Text)
     private String nickname;
     private String avatar;
     private String sign;
     private String gender;
     private String birthday;
+    @Field(type = FieldType.Date)
     private LocalDateTime createdTime;
+    @Field(type = FieldType.Date)
     private LocalDateTime updatedTime;
     private Boolean followed;
 

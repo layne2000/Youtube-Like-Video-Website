@@ -1,20 +1,27 @@
 package org.example.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
+@Document(indexName = "videos")
 public class Video {
+    @Id
     private Long id;
 
+    @Field(type = FieldType.Long)
     private Long userId;
 
     private String url;
 
     private String thumbnail;
 
+    @Field(type = FieldType.Text)
     private String title;
 
     private String type;
@@ -23,10 +30,13 @@ public class Video {
 
     private String section;
 
+    @Field(type = FieldType.Text)
     private String description;
 
+    @Field(type = FieldType.Date)
     private LocalDateTime createdTime;
 
+    @Field(type = FieldType.Date)
     private LocalDateTime updatedTime;
 
     private List<VideoTag> videoTagList;

@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.entity.Video;
-import org.example.entity.VideoCoin;
-import org.example.entity.VideoCollection;
-import org.example.entity.VideoComment;
+import org.example.entity.*;
 import org.example.util.JsonResponse;
 import org.example.util.PageResult;
 import org.example.util.UserSupport;
@@ -25,10 +22,14 @@ public class VideoController {
 
     private final UserSupport userSupport;
 
+    private final ElasticSearchService elasticSearchService;
+
     @Autowired
-    VideoController(VideoService videoService, UserSupport userSupport){
+    VideoController(VideoService videoService, UserSupport userSupport, 
+                    ElasticSearchService elasticSearchService){
         this.videoService = videoService;
         this.userSupport = userSupport;
+        this.elasticSearchService = elasticSearchService;
     }
 
     // TODO: save the video in file server by frontend?
@@ -37,9 +38,7 @@ public class VideoController {
         Long userId = userSupport.getCurrentUserId();
         video.setUserId(userId);
         videoService.addVideo(video);
-        //TODO
-//        //在es中添加一条视频数据
-//        elasticSearchService.addVideo(video);
+        elasticSearchService.addVideo(video);
         return JsonResponse.success();
     }
 
@@ -144,4 +143,39 @@ public class VideoController {
         return new JsonResponse<>(result);
     }
 
+    //TODO: request body?
+    @PostMapping("/video-views")
+    public JsonResponse<String> addVideoView(@RequestBody VideoView videoView,
+                                             HttpServletRequest request){
+        Long userId;
+        try{
+            userId = userSupport.getCurrentUserId();
+            videoView.setUserId(userId);
+            videoService.addVideoView(videoView, request);
+        }catch (Exception e){
+            videoService.addVideoView(videoView, request);
+        }
+        return JsonResponse.success();
+    }
+
+    @GetMapping("/video-view-counts")
+    public JsonResponse<Integer> getCountByVideoId(@RequestParam Long videoId){
+        Integer count = videoService.getCountByVideoId(videoId);
+        return new JsonResponse<>(count);
+    }
+
+
+    @GetMapping("/video-tags")
+    public JsonResponse<List<VideoTag>> getVideoTagsByVideoId(@RequestParam Long videoId) {
+        List<VideoTag> list = videoService.getVideoTagListByVideoId(videoId);
+        return new JsonResponse<>(list);
+    }
+
+    @DeleteMapping("/video-tags")
+    public JsonResponse<String> deleteVideoTags(@RequestBody JSONObject params) {
+        String tagIdList = params.getString("tagIdList");
+        Long videoId = params.getLong("videoId");
+        videoService.deleteVideoTagsByTagIdList(JSONArray.parseArray(tagIdList).toJavaList(Long.class), videoId);
+        return JsonResponse.success();
+    }
 }

@@ -1,5 +1,6 @@
 package org.example;
 
+import eu.bitwalker.useragentutils.UserAgent;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.ibatis.annotations.Select;
@@ -7,12 +8,14 @@ import org.example.entity.*;
 import org.example.exception.CustomizedException;
 import org.example.mapper.*;
 import org.example.util.FastDFSUtil;
+import org.example.util.IpUtil;
 import org.example.util.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,12 +30,13 @@ public class VideoService {
     private final VideoCoinMapper videoCoinMapper;
     private final VideoCommentMapper videoCommentMapper;
     private final UserInfoMapper userInfoMapper;
+    private final VideoViewMapper videoViewMapper;
     @Autowired
     VideoService(VideoMapper videoMapper, VideoTagMapper videoTagMapper,
                  FastDFSUtil fastDFSUtil, VideoLikeMapper videoLikeMapper,
                  VideoCollectionMapper videoCollectionMapper, UserCoinMapper userCoinMapper,
                  VideoCoinMapper videoCoinMapper, VideoCommentMapper videoCommentMapper,
-                 UserInfoMapper userInfoMapper){
+                 UserInfoMapper userInfoMapper, VideoViewMapper videoViewMapper){
         this.videoMapper = videoMapper;
         this.videoTagMapper = videoTagMapper;
         this.fastDFSUtil = fastDFSUtil;
@@ -42,6 +46,7 @@ public class VideoService {
         this.videoCoinMapper = videoCoinMapper;
         this.videoCommentMapper = videoCommentMapper;
         this.userInfoMapper = userInfoMapper;
+        this.videoViewMapper = videoViewMapper;
     }
 
     @Transactional
@@ -245,5 +250,57 @@ public class VideoService {
         res.put("video", video);
         res.put("userInfo", userInfo);
         return res;
+    }
+
+    public List<VideoTag> getVideoTagListByVideoId(Long videoId) {
+        if(videoId == null){
+            throw new CustomizedException("Invalid parameter");
+        }
+        Video video = videoMapper.getVideoById(videoId);
+        if(video == null){
+            throw new CustomizedException("Invalid video");
+        }
+        return videoTagMapper.getVideoTagListByVideoId(videoId);
+    }
+
+    public void deleteVideoTagsByTagIdList(List<Long> tagIdList, Long videoId) {
+        if(videoId == null){
+            throw new CustomizedException("Invalid parameter");
+        }
+        Video video = videoMapper.getVideoById(videoId);
+        if(video == null){
+            throw new CustomizedException("Invalid video");
+        }
+        videoTagMapper.deleteVideoTagsByTagIdList(tagIdList, videoId);
+    }
+
+    public void addVideoView(VideoView videoView, HttpServletRequest request) {
+        Long userId = videoView.getUserId();
+        Long videoId = videoView.getVideoId();
+        Map<String, Object> params = new HashMap<>();
+        // generate clientId based browser and OS
+        String clientId = String.valueOf(UserAgent.parseUserAgentString(request.getHeader("User-Agent")));
+        String ip = IpUtil.getIP(request);
+        if(userId != null){
+            params.put("userId", userId);
+        } else { // visitor mode
+            params.put("ip", ip);
+            params.put("clientId", clientId);
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        params.put("today", LocalDateTime.now().format(formatter));
+        params.put("videoId", videoId);
+        // get the videoView today by userId or clientId and ip (visitor)
+        VideoView dbVideoView = videoViewMapper.getVideoView(params);
+        if(dbVideoView == null){
+            videoView.setIp(ip);
+            videoView.setClientId(clientId);
+            videoView.setCreatedTime(LocalDateTime.now());
+            videoViewMapper.insertVideoView(videoView);
+        }
+    }
+
+    public Integer getCountByVideoId(Long videoId) {
+        return videoViewMapper.getCountByVideoId(videoId);
     }
 }

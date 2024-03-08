@@ -297,4 +297,29 @@ public interface DBInitializer {
             + "createdTime datetime DEFAULT NULL"
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createLiveCommentTable();
+
+    @Update("DROP TABLE IF EXISTS t_video_view")
+    void dropVideoViewTable();
+
+    @Update("CREATE TABLE t_video_view ( "
+            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            + "videoId bigint NOT NULL, "
+            + "userId bigint NOT NULL, "
+            + "clientId varchar(500) DEFAULT NULL COMMENT 'based on browser and OS'"
+            + "ip varchar(50) DEFAULT NULL"
+            + "createdTime datetime DEFAULT NULL"
+            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    void createVideoViewTable();
+
+//    @Update("DROP TABLE IF EXISTS t_video_operation")
+//    void dropVideoOperationTable();
+//
+//    @Update("CREATE TABLE t_video_operation ( "
+//            + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+//            + "videoId bigint NOT NULL, "
+//            + "userId bigint NOT NULL, "
+//            + "operationType varchar(3) DEFAULT NULL COMMENT '0 like 1 collect 2 sponsor(coin)'"
+//            + "createdTime datetime DEFAULT NULL"
+//            + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+//    void createVideoOperationTable();
 }

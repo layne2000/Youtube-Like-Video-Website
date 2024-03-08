@@ -1,9 +1,6 @@
 package org.example.mapper;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.InsertProvider;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.*;
 import org.example.entity.VideoTag;
 
 import java.util.List;
@@ -13,6 +10,18 @@ public interface VideoTagMapper {
 
     @InsertProvider(type = VideoTagListSqlProvider.class, method = "insertVideoTagListSql")
     void addVideoTagList(@Param("videoTagList")List<VideoTag> videoTagList);
+
+    @Select("SELECT * FROM t_video_tag WHERE videoId = #{videoId}")
+    List<VideoTag> getVideoTagListByVideoId(Long videoId);
+
+    @Select("<script>" +
+            "SELECT *" +
+            "FROM t_video_tag WHERE videoId = #{videoId} AND tagId IN " +
+            "<foreach item='tagId' collection='tagIdList' open='(' separator=',' close=')'>" +
+            "#{tagId}" +
+            "</foreach>" +
+            "</script>")
+    void deleteVideoTagsByTagIdList(List<Long> tagIdList, Long videoId);
 }
 
 class VideoTagListSqlProvider {
