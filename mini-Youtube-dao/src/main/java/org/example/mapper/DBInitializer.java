@@ -134,7 +134,7 @@ public interface DBInitializer {
             + "createdTime datetime DEFAULT NULL, "
             + "updatedTime datetime DEFAULT NULL "
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
-    void createAuthMenuTable();
+    void createAuthMenuTable(); // for menu/webpage access control
 
     @Update("DROP TABLE IF EXISTS t_menu_role_association")
     void dropMenuRoleAssociationTable();

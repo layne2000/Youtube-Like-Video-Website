@@ -41,7 +41,7 @@ public class VideoController {
     }
 
     @GetMapping("/videos")
-    public JsonResponse<PageResult<Video>> pageListVideos(Integer size, Integer num, String section){
+    public JsonResponse<PageResult<Video>> pageListVideos(@RequestParam Integer size, @RequestParam Integer num, String section){
         PageResult<Video> result = videoService.pageListVideos(size, num, section);
         return new JsonResponse<>(result);
     }

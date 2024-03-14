@@ -11,9 +11,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -28,9 +25,7 @@ public class LiveCommentService {
         this.liveCommentMapper = liveCommentMapper;
     }
 
-
-    @Async
-    public void asyncAddLiveCommentToDB(LiveComment liveComment) {
+    public void addLiveCommentToDB(LiveComment liveComment) {
         liveCommentMapper.insertLiveComment(liveComment);
     }
 
@@ -50,17 +45,19 @@ public class LiveCommentService {
         String redisKey = LIVE_COMMENT_BASE_KEY + videoId;
         String redisVal = redisTemplate.opsForValue().get(redisKey);
         List<LiveComment> resList;
-        if(!StringUtil.isNullOrEmpty(redisVal)){
+        if(!StringUtil.isNullOrEmpty(redisVal)){// fetch from the redis
             resList = JSONArray.parseArray(redisVal, LiveComment.class);
             if(!StringUtil.isNullOrEmpty(startTimeStr)
                     && !StringUtil.isNullOrEmpty(endTimeStr)){
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                LocalDateTime startTime = LocalDateTime.parse(startTimeStr, formatter);
-                LocalDateTime endTime = LocalDateTime.parse(endTimeStr, formatter);
+//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//                LocalDateTime startTime = LocalDateTime.parse(startTimeStr, formatter);
+//                LocalDateTime endTime = LocalDateTime.parse(endTimeStr, formatter);
                 List<LiveComment> filteredList = new ArrayList<>();
                 for(LiveComment liveComment : resList){
-                    LocalDateTime createdTime = liveComment.getCreatedTime();
-                    if (createdTime.isAfter(startTime) && createdTime.isBefore(endTime)) {
+//                    LocalDateTime createdTime = liveComment.getCreatedTime();
+                    long appearingTime = Long.parseLong(liveComment.getAppearingTime());
+//                    if (createdTime.isAfter(startTime) && createdTime.isBefore(endTime)) {
+                    if(appearingTime >= Long.parseLong(startTimeStr) && appearingTime <= Long.parseLong(endTimeStr)){
                         filteredList.add(liveComment);
                     }
                 }

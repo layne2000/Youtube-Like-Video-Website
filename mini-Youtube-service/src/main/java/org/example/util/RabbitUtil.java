@@ -13,7 +13,7 @@ public class RabbitUtil {
     }
 
     @Async
-    public void sendAsyncMsgToMQ(byte[] msg){
+    public void sendAsyncLiveCommentMsgToMQ(byte[] msg){
         rabbitTemplate.convertAndSend(MQConstant.QUEUE_LIVE_COMMENTS, msg);
     }
 }
