@@ -26,6 +26,6 @@ public interface VideoMapper {
             "</script>")
     List<Video> pageListVideos(Map<String, Object> mapperParams);
 
-    @Select("SELECT * FROM t_video WHERE id = #{id} FOR UPDATE")
+    @Select("SELECT * FROM t_video WHERE id = #{id}")
     Video getVideoById(Long id);
 }

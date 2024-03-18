@@ -8,7 +8,7 @@ import org.example.entity.VideoLike;
 
 @Mapper
 public interface VideoLikeMapper {
-    @Select("SELECT * FROM t_video_like WHERE userId = #{userId} AND videoId = #{videoId} FOR UPDATE")
+    @Select("SELECT * FROM t_video_like WHERE userId = #{userId} AND videoId = #{videoId}")
     VideoLike getVideoLikeByUserIdAndVideoId(Long userId, Long videoId);
 
     @Insert("INSERT INTO t_video_like (userId, videoId, createdTime) " +

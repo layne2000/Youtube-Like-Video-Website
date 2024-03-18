@@ -85,7 +85,7 @@ public class HttpUtil {
                                    Map<String, Object> headers,
                                    HttpServletResponse response) throws Exception {
         URL urlObj = new URL(url);
-        HttpURLConnection con = (HttpURLConnection) urlObj.openConnection(); // only create an object
+        HttpURLConnection con = (HttpURLConnection) urlObj.openConnection(); // just create an object
         con.setDoInput(true); // allow reading response (con.getInputStream())
         con.setRequestMethod(REQUEST_METHOD_GET);
         con.setConnectTimeout(CONNECT_TIME_OUT);

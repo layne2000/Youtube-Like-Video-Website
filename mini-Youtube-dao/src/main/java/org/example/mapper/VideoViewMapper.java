@@ -38,7 +38,7 @@ public interface VideoViewMapper {
                         WHERE("ip = #{ip}");
                     }
                 }
-            }}.toString() + " FOR UPDATE";
+            }}.toString();
         }
     }
 }

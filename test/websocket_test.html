@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Websocket Communication</title>
+</head>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<script>
+    var socket;
+    function openSocket() {
+        if (typeof (WebSocket) == "undefined") {
+            console.log("Your browser doesn't support WebSocket");
+        } else {
+            console.log("Your browser supports WebSocket");
+            var socketUrl = "ws://localhost:8080/websocket/eyJraWQiOiIxIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJKd3RJc3N1ZXIiLCJleHAiOjE3MTA0MjE1NjF9.ND_n34HVVspbEu9blgqnqHtOcmunAE2QKe6326iCdMdrkyGTj5dHZseEZcF3HBHaV78fkLIp9WvudcONag-WKES3Mf-DnmH5BgJjEAIqqVEQfXsmuWkJX4UfDQ1YTyulGRhbE4F9-mqrtiyJoRgS7thL_7IcxmRchwdr9x2OGwk/4";
+            console.log(socketUrl);
+            if (socket != null) {
+                socket.close();
+                socket = null;
+            }
+            socket = new WebSocket(socketUrl);
+
+            socket.onopen = function () {
+                console.log("websocket open");
+
+            };
+
+            socket.onmessage = function (msg) {
+                console.log(msg.data);
+
+            };
+
+            socket.onclose = function () {
+                console.log("websocket closed");
+            };
+
+            socket.onerror = function () {
+                console.log("websocket error");
+            }
+        }
+    }
+    function sendMessage() {
+        if (typeof (WebSocket) == "undefined") {
+            console.log("Your browser doesn't support WebSocket");
+        } else {
+            console.log("Your browser supports WebSocket");
+            for (let i = 0; i < 10000; ++i) {
+                socket.send('{"videoId": 4, "content": "this is content", "appearingTime": "10"}');
+            }
+        }
+    }
+</script>
+
+<body>
+    <p>【userId】：
+    <div><input id="userId" name="userId" type="text" value="10"></div>
+    <p>【toUserId】：
+    <div><input id="toUserId" name="toUserId" type="text" value="20"></div>
+    <p>【toUserId】：
+    <div><input id="contentText" name="contentText" type="text" value="hello websocket"></div>
+    <p>【Operation】：
+    <div><a onclick="openSocket()">open socket</a></div>
+    <p>【Operation】：
+    <div><a onclick="sendMessage()">send msg</a></div>
+</body>
+
+</html>

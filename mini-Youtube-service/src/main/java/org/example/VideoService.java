@@ -84,7 +84,7 @@ public class VideoService {
         }catch(Exception ignored){}
     }
 
-    @Transactional
+
     public void insertVideoLike(Long videoId, Long userId) {
         Video video = videoMapper.getVideoById(videoId);
         if(video == null){
@@ -157,7 +157,6 @@ public class VideoService {
             throw new CustomizedException("Not enough coins");
         }
         VideoCoin dbVideoCoin = videoCoinMapper.getVideoCoinByVideoIdAndUserId(videoId, userId);
-        // TODO: totally different?
         if(dbVideoCoin == null){ // user haven't given this video coin before
             dbVideoCoin = new VideoCoin();
             dbVideoCoin.setUserId(userId);
@@ -182,7 +181,6 @@ public class VideoService {
         return res;
     }
 
-    @Transactional
     public void insertVideoComment(VideoComment videoComment, Long userId) {
         Long videoId = videoComment.getVideoId();
         if(videoId == null){
@@ -208,7 +206,7 @@ public class VideoService {
         videoCommentParams.put("limit", size);
         videoCommentParams.put("videoId", videoId);
         List<VideoComment> resList = videoCommentMapper.pageListRootVideoComments(videoCommentParams);
-        Integer total = videoCommentMapper.getRootCommentNumByVideoId(videoId); // TODO: difference?
+        Integer total = videoCommentMapper.getRootCommentNumByVideoId(videoId);
         if(resList.size() == 0){
             return new PageResult<>(total, resList);
         }
@@ -233,7 +231,7 @@ public class VideoService {
         resList.forEach(videoComment -> {
             Long id = videoComment.getId();
             List<VideoComment> childList = new ArrayList<>();
-            childCommentList.forEach(childComment ->{//TODO: search in the DB right now?
+            childCommentList.forEach(childComment ->{
                 if(id.equals(childComment.getRootCommentId())){
                     childComment.setUserInfo(userInfoMap.get(childComment.getUserId()));
                     childComment.setReplyUserInfo(userInfoMap.get(childComment.getReplyUserId()));
@@ -283,12 +281,11 @@ public class VideoService {
         videoTagMapper.deleteVideoTagsByTagIdList(tagIdList, videoId);
     }
 
-    @Transactional
     public void addVideoView(VideoView videoView, HttpServletRequest request) {
         Long userId = videoView.getUserId();
         Long videoId = videoView.getVideoId();
         Map<String, Object> params = new HashMap<>();
-        // generate clientId based browser and OS
+        // generate clientId based on browser and OS
         String clientId = String.valueOf(UserAgent.parseUserAgentString(request.getHeader("User-Agent")));
         String ip = IpUtil.getIP(request);
         if(userId != null){
@@ -310,7 +307,7 @@ public class VideoService {
         }
     }
 
-    public Integer getCountByVideoId(Long videoId) {
+    public Integer getVideoViewByVideoId(Long videoId) {
         return videoViewMapper.getCountByVideoId(videoId);
     }
 }

@@ -42,46 +42,50 @@ public class WebSocketService {
     private static ApplicationContext applicationContext;
 
     @OnOpen
-    public void openConnection(Session session, @PathParam("token") String token, @PathParam("videoId") Long videoId){
-        try{
+    public void openConnection(Session session, @PathParam("token") String token, @PathParam("videoId") Long videoId) {
+        try {
             userId = TokenUtil.verifyToken(token);
-        } catch(Exception ignored){
-            logger.info("Non-user connected via websocket!");
+        } catch (Exception ignored) {
+            logger.error("Non-user connected via websocket!");
         }
         this.videoId = videoId;
         sessionId = session.getId();
         this.session = session;
         WEBSOCKET_MAP.put(sessionId, this);
-        if(!videoIdLockMap.contains(videoId)){
+        if (!videoIdLockMap.contains(videoId)) {
             videoIdLockMap.put(videoId, new Object());
         }
         insertVideoSession(videoId, sessionId);
 //            ONLINE_COUNT.getAndIncrement();
-        try{
+        try {
             this.sendMessage("0");
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Websocket abnormal connection");
         }
     }
 
     @OnClose
-    public void closeConnection(){
+    public void closeConnection() {
         //            ONLINE_COUNT.getAndDecrement();
         WEBSOCKET_MAP.remove(sessionId);
         removeVideoSession(videoId, sessionId);
-        logger.info("Websocket session was closed: " + sessionId );
+        logger.info("Websocket session was closed: " + sessionId);
     }
 
     @OnMessage
-    public void onMessage(String message){ // message includes videoId info
+    public void onMessage(String message) throws IOException { // message includes videoId info
         logger.info("Websocket session id: " + sessionId + ", msg: " + message);
-        if(message != null && !message.equals("")){
-            try{
+        if (userId == null) {
+            this.sendMessage("please connect with valid token");
+            return;
+        }
+        if (message != null && !message.equals("")) {
+            try {
                 // send to frontend
                 Set<String> sessionIdSet = VIDEO_SESSION_MAP.get(videoId);
-                for(String sessionId : sessionIdSet){
+                for (String sessionId : sessionIdSet) {
                     WebSocketService webSocketService = WebSocketService.WEBSOCKET_MAP.get(sessionId);
-                    if(webSocketService != null && webSocketService.getSession().isOpen()){
+                    if (webSocketService != null && webSocketService.getSession().isOpen()) {
                         try {
                             webSocketService.sendMessage(message);
                         } catch (IOException e) {
@@ -89,23 +93,20 @@ public class WebSocketService {
                         }
                     }
                 }
+                // async send to MQ and then add to DB
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("message", message);
+                jsonObject.put("userId", userId);
+                RabbitUtil rabbitUtil = (RabbitUtil) applicationContext.getBean(RabbitUtil.class);
+                rabbitUtil.sendAsyncLiveCommentMsgToMQ(jsonObject.toJSONString().getBytes(StandardCharsets.UTF_8));
 
-                if(userId != null){ // shouldn't be null since only user can send liveComments
-                    // async send to MQ and then add to DB
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("message", message);
-                    jsonObject.put("userId", userId);
-                    RabbitUtil rabbitUtil = (RabbitUtil)applicationContext.getBean(RabbitUtil.class);
-                    rabbitUtil.sendAsyncLiveCommentMsgToMQ(jsonObject.toJSONString().getBytes(StandardCharsets.UTF_8));
-
-                    // add to redis
-                    LiveComment liveComment = JSONObject.parseObject(message, LiveComment.class);
-                    liveComment.setUserId(userId);
-                    liveComment.setCreatedTime(LocalDateTime.now());
-                    LiveCommentService liveCommentService = (LiveCommentService) applicationContext.getBean(LiveCommentService.class);
-                    liveCommentService.addLiveCommentToRedis(liveComment);
-                }
-            } catch(Exception e){
+                // add to redis
+                LiveComment liveComment = JSONObject.parseObject(message, LiveComment.class);
+                liveComment.setUserId(userId);
+                liveComment.setCreatedTime(LocalDateTime.now());
+                LiveCommentService liveCommentService = (LiveCommentService) applicationContext.getBean(LiveCommentService.class);
+                liveCommentService.addLiveCommentToRedis(liveComment);
+            } catch (Exception e) {
                 logger.error("Error in receiving live comment");
                 e.printStackTrace();
             }
@@ -113,11 +114,11 @@ public class WebSocketService {
     }
 
     @OnError
-    public void onError(Throwable error){
+    public void onError(Throwable error) {
         logger.error("Websocket error: " + error.getMessage());
     }
 
-    public void sendMessage(String message) throws IOException{
+    public void sendMessage(String message) throws IOException {
         session.getBasicRemote().sendText(message);
     }
 
@@ -137,7 +138,7 @@ public class WebSocketService {
     // in case that multiple threads fetch the same value(hashset) of the same key
     // and modify it concurrently
     public static void insertVideoSession(Long videoId, String sessionId) {
-        synchronized (videoIdLockMap.get(videoId)){ // finer lock
+        synchronized (videoIdLockMap.get(videoId)) { // finer lock
             HashSet<String> hashSet = VIDEO_SESSION_MAP.get(videoId);
             if (hashSet == null) {
                 hashSet = new HashSet<>();
@@ -148,7 +149,7 @@ public class WebSocketService {
     }
 
     private static void removeVideoSession(Long videoId, String sessionId) {
-        synchronized (videoIdLockMap.get(videoId)){
+        synchronized (videoIdLockMap.get(videoId)) {
             HashSet<String> hashSet = VIDEO_SESSION_MAP.get(videoId);
             hashSet.remove(sessionId);
             VIDEO_SESSION_MAP.put(videoId, hashSet);

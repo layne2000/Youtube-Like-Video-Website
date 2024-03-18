@@ -30,7 +30,6 @@ public class VideoController {
         this.elasticSearchService = elasticSearchService;
     }
 
-    // TODO: save the video in file server by frontend?
     @PostMapping("/videos")
     public JsonResponse<String> addVideo(@RequestBody Video video){
         Long userId = userSupport.getCurrentUserId();
@@ -165,8 +164,8 @@ public class VideoController {
     }
 
     @GetMapping("/video-view-counts")
-    public JsonResponse<Integer> getCountByVideoId(@RequestParam Long videoId){
-        Integer count = videoService.getCountByVideoId(videoId);
+    public JsonResponse<Integer> getVideoViewByVideoId(@RequestParam Long videoId){
+        Integer count = videoService.getVideoViewByVideoId(videoId);
         return new JsonResponse<>(count);
     }
 

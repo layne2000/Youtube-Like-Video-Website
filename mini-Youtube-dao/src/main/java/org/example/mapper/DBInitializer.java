@@ -176,7 +176,7 @@ public interface DBInitializer {
     @Update("CREATE TABLE t_video ( "
             + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
             + "userId bigint NOT NULL, "
-            + "url varchar(500) NOT NULL, "
+            + "url varchar(500) NOT NULL UNIQUE, "
             + "thumbnail varchar(500) NOT NULL COMMENT 'video thumbnail url', "
             + "title varchar(255) NOT NULL, "
             + "type varchar(5) NOT NULL COMMENT '0 self-made 1 shared', "
@@ -193,7 +193,7 @@ public interface DBInitializer {
 
     @Update("CREATE TABLE t_tag ( "
             + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
-            + "name varchar(500) NOT NULL, "
+            + "name varchar(500) NOT NULL UNIQUE, "
             + "createdTime datetime DEFAULT NULL"
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createTagTable();
@@ -205,7 +205,8 @@ public interface DBInitializer {
             + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
             + "videoId bigint NOT NULL, "
             + "tagId bigint NOT NULL, "
-            + "createdTime datetime DEFAULT NULL"
+            + "createdTime datetime DEFAULT NULL, "
+            + "UNIQUE(videoId, tagId) "
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createVideoTagAssociationTable();
 
@@ -216,7 +217,8 @@ public interface DBInitializer {
             + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
             + "videoId bigint NOT NULL, "
             + "userId bigint NOT NULL, "
-            + "createdTime datetime DEFAULT NULL"
+            + "createdTime datetime DEFAULT NULL, "
+            + "UNIQUE(videoId, userId) "
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createVideoLikeTable();
 
@@ -229,7 +231,8 @@ public interface DBInitializer {
             + "name varchar(50) DEFAULT NULL, "
             + "type varchar(2) DEFAULT NULL COMMENT '0 default 1 customized', "
             + "createdTime datetime DEFAULT NULL, "
-            + "updatedTime datetime DEFAULT NULL"
+            + "updatedTime datetime DEFAULT NULL, "
+            + "UNIQUE(userId, name) "
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createCollectionGroupTable();
 
@@ -241,7 +244,8 @@ public interface DBInitializer {
             + "videoId bigint NOT NULL, "
             + "userId bigint NOT NULL, "
             + "groupId bigint NOT NULL, "
-            + "createdTime datetime DEFAULT NULL"
+            + "createdTime datetime DEFAULT NULL, "
+            + "UNIQUE(videoId, groupId) "
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createVideoCollectionTable();
 
@@ -250,7 +254,7 @@ public interface DBInitializer {
 
     @Update("CREATE TABLE t_user_coin ( "
             + "id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, "
-            + "userId bigint NOT NULL, "
+            + "userId bigint NOT NULL UNIQUE, "
             + "amount bigint NOT NULL DEFAULT 0, "
             + "createdTime datetime DEFAULT NULL, "
             + "updatedTime datetime DEFAULT NULL"
@@ -266,7 +270,8 @@ public interface DBInitializer {
             + "userId bigint NOT NULL, "
             + "amount bigint NOT NULL DEFAULT 0, "
             + "createdTime datetime DEFAULT NULL, "
-            + "updatedTime datetime DEFAULT NULL"
+            + "updatedTime datetime DEFAULT NULL, "
+            + "UNIQUE(videoId, userId) "
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createVideoCoinTable();
 
@@ -281,7 +286,8 @@ public interface DBInitializer {
             + "rootCommentId bigint DEFAULT NULL, "
             + "content text NOT NULL, "
             + "createdTime datetime DEFAULT NULL, "
-            + "updatedTime datetime DEFAULT NULL"
+            + "updatedTime datetime DEFAULT NULL, "
+            + "INDEX composite_idx(videoId, rootCommentId), INDEX(rootCommentId)"
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createVideoCommentTable();
 
@@ -294,7 +300,8 @@ public interface DBInitializer {
             + "userId bigint NOT NULL, "
             + "content text DEFAULT NULL, "
             + "appearingTime varchar(50) DEFAULT NULL, "
-            + "createdTime datetime DEFAULT NULL"
+            + "createdTime datetime DEFAULT NULL, "
+            + "INDEX composite_idx(videoId, appearingTime)"
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createLiveCommentTable();
 
@@ -307,7 +314,8 @@ public interface DBInitializer {
             + "userId bigint DEFAULT NULL, "
             + "clientId varchar(500) DEFAULT NULL COMMENT 'based on browser and OS', "
             + "ip varchar(50) DEFAULT NULL, "
-            + "createdTime datetime DEFAULT NULL"
+            + "createdTime datetime DEFAULT NULL,"
+            + "INDEX (videoId),  UNIQUE(videoId, userId)"
             + ")ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     void createVideoViewTable();
 

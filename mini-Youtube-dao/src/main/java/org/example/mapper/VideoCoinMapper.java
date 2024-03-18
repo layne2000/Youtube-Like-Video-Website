@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Mapper
 public interface VideoCoinMapper {
 
-    @Select("SELECT * FROM t_video_coin WHERE videoId = #{videoId} AND userId = #{userId} FOR UPDATE")
+    @Select("SELECT * FROM t_video_coin WHERE videoId = #{videoId} AND userId = #{userId}")
     VideoCoin getVideoCoinByVideoIdAndUserId(Long videoId, Long userId);
 
     @Insert("INSERT INTO t_video_coin (userId, videoId, amount, createdTime) " +
